@@ -53,6 +53,11 @@ public:
     void filter(fu2::unique_function<void(HttpResponse<SSL> *, int)> &&filterHandler) {
         httpContext->filter(std::move(filterHandler));
     }
+    
+    /* Attaches a "use" function to support middleware for general functionality */
+    void use(fu2::unique_function<void(HttpResponse<SSL> *, HttpRequest *)> &&handler){
+        httpContext->use(std::move(handler));
+    }
 
     /* Publishes a message to all websocket contexts */
     void publish(std::string_view topic, std::string_view message, OpCode opCode, bool compress = false) {

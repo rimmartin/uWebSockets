@@ -140,6 +140,11 @@ private:
                 /* Mark pending request and emit it */
                 httpResponseData->state = HttpResponseData<SSL>::HTTP_RESPONSE_PENDING;
 
+                /* General middleware functionality */
+                for (auto &f : httpContextData->useHandlers) {
+                    f((HttpResponse<SSL> *) s, httpRequest);
+                }
+                
                 /* Route the method and URL in two passes */
                 typename HttpContextData<SSL>::RouterData routerData = {(HttpResponse<SSL> *) s, httpRequest};
                 if (!httpContextData->router.route(httpRequest->getMethod(), httpRequest->getUrl(), routerData)) {
@@ -343,6 +348,10 @@ public:
 
     void filter(fu2::unique_function<void(HttpResponse<SSL> *, int)> &&filterHandler) {
         getSocketContextData()->filterHandlers.emplace_back(std::move(filterHandler));
+    }
+
+    void use(fu2::unique_function<void(HttpResponse<SSL> *, HttpRequest *)> &&useHandler) {
+        getSocketContextData()->useHandlers.emplace_back(std::move(useHandler));
     }
 
     /* Register an HTTP route handler acording to URL pattern */

@@ -33,6 +33,7 @@ struct alignas(16) HttpContextData {
     template <bool> friend struct HttpResponse;
 private:
     std::vector<fu2::unique_function<void(HttpResponse<SSL> *, int)>> filterHandlers;
+    std::vector<fu2::unique_function<void(HttpResponse<SSL> *, HttpRequest *)>> useHandlers;
 
     struct RouterData {
         HttpResponse<SSL> *httpResponse;
